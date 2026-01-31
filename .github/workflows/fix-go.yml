@@ -1,0 +1,28 @@
+name: Fix Go Dependencies
+on:
+  workflow_dispatch: # This allows you to click a button to run it!
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Generate go.sum
+        run: |
+          go mod tidy
+          
+      - name: Commit and Push
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add go.sum go.mod
+          git commit -m "Auto-fix: Generated go.sum and tidied go.mod" || echo "No changes to commit"
+          git push
